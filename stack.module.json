@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "ntfy",
+  "repo": "ntfy-stack-module",
+  "runtimeId": "ntfy",
+  "lifecycle": "active",
+  "dependencies": [
+    "stack-foundation"
+  ],
+  "overlays": [
+    "stack.compose/ntfy.yml",
+    "stack.config/ntfy"
+  ]
+}
