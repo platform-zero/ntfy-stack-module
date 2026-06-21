@@ -18,7 +18,9 @@
   "overlays": [
     "stack.compose/ntfy.yml",
     "stack.config/ntfy",
-    "stack.containers/test-runner/playwright-tests/tests/deep/forward-auth/ntfy.spec.ts"
+    "stack.containers/test-runner/playwright-tests/tests/deep/forward-auth/ntfy.spec.ts",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/NtfyUtilityServicesTests.kt",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/NtfyExtendedCommunicationTests.kt"
   ],
   "testAssets": []
 }
