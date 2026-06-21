@@ -3,6 +3,7 @@ package org.webservices.testrunner.suites
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import org.webservices.testrunner.framework.*
 
 suspend fun TestRunner.ntfyExtendedCommunicationTests() = suite("Ntfy Extended Communication Tests") {
