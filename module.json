@@ -1,0 +1,42 @@
+{
+  "configuration": {
+    "schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    }
+  },
+  "id": "ntfy",
+  "overlays": [
+    "stack.compose/ntfy.yml",
+    "stack.config/ntfy",
+    "stack.containers/test-runner/playwright-tests/tests/deep/forward-auth/ntfy.spec.ts",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/NtfyUtilityServicesTests.kt",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/NtfyExtendedCommunicationTests.kt"
+  ],
+  "provides": [
+    {
+      "capability": "module:ntfy",
+      "version": "1"
+    }
+  ],
+  "requires": [
+    {
+      "capability": "module:stack-foundation",
+      "version": "1"
+    }
+  ],
+  "schemaVersion": 1,
+  "services": [
+    {
+      "name": "ntfy",
+      "routes": [],
+      "volumes": []
+    }
+  ],
+  "verification": {
+    "commands": [
+      "test -f stack.module.json && test -f module.json"
+    ]
+  }
+}
