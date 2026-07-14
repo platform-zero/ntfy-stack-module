@@ -6,7 +6,7 @@
 - Lifecycle: `active`
 
 ## Owned overlays
-- `stack.compose/ntfy.yml`
+- `stack.runtime.yaml`
 - `stack.config/ntfy`
 
 ## Dependencies
