@@ -39,6 +39,7 @@ ntfy access "$NTFY_USERNAME" "webservices-warnings" write-only || true
 ntfy access ntfy-sso "webservices-alerts" read-write
 ntfy access ntfy-sso "webservices-critical" read-write
 ntfy access ntfy-sso "webservices-warnings" read-write
+ntfy access ntfy-sso "*_alerts" read-write
 echo "[ntfy-init] Granting access to test-* topics for integration tests"
 ntfy access "$NTFY_USERNAME" "test-*" read-write || true
 ntfy access ntfy-sso "test-*" read-write
