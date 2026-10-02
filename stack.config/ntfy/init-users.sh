@@ -16,13 +16,9 @@ if [ ! -f "$AUTH_DB" ]; then
     echo "[ntfy-init] ERROR: Auth database not found after 60 seconds"
     exit 1
 fi
-if [ -f "$USER_PROVISIONED_FLAG" ]; then
-    echo "[ntfy-init] Users already provisioned, skipping"
-    exit 0
-fi
-echo "[ntfy-init] Provisioning users..."
-if [ -z "$NTFY_USERNAME" ] || [ -z "$NTFY_PASSWORD" ]; then
-    echo "[ntfy-init] ERROR: NTFY_USERNAME and NTFY_PASSWORD must be set"
+echo "[ntfy-init] Reconciling users and topic permissions..."
+if [ -z "${NTFY_USERNAME:-}" ] || [ -z "${NTFY_PASSWORD:-}" ] || [ -z "${NTFY_SSO_PASSWORD:-}" ]; then
+    echo "[ntfy-init] ERROR: publisher and SSO credentials must be set"
     exit 1
 fi
 if ntfy user list | grep -q "^user ${NTFY_USERNAME}"; then
@@ -31,12 +27,22 @@ else
     echo "[ntfy-init] Creating user: ${NTFY_USERNAME}"
     printf "%s\n%s\n" "$NTFY_PASSWORD" "$NTFY_PASSWORD" | ntfy user add "$NTFY_USERNAME"
 fi
+if ntfy user list | grep -q '^user ntfy-sso '; then
+    NTFY_PASSWORD="$NTFY_SSO_PASSWORD" ntfy user change-pass ntfy-sso
+else
+    NTFY_PASSWORD="$NTFY_SSO_PASSWORD" ntfy user add ntfy-sso
+fi
 echo "[ntfy-init] Granting access to webservices-* topics"
 ntfy access "$NTFY_USERNAME" "webservices-alerts" write-only || true
 ntfy access "$NTFY_USERNAME" "webservices-critical" write-only || true
 ntfy access "$NTFY_USERNAME" "webservices-warnings" write-only || true
+ntfy access ntfy-sso "webservices-alerts" read-write
+ntfy access ntfy-sso "webservices-critical" read-write
+ntfy access ntfy-sso "webservices-warnings" read-write
+ntfy access ntfy-sso "*_alerts" read-write
 echo "[ntfy-init] Granting access to test-* topics for integration tests"
 ntfy access "$NTFY_USERNAME" "test-*" read-write || true
+ntfy access ntfy-sso "test-*" read-write
 touch "$USER_PROVISIONED_FLAG"
 echo "[ntfy-init] User provisioning complete!"
 ntfy user list
