@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
-NTFY_DATA_DIR="/var/lib/ntfy"
+umask 077
+NTFY_DATA_DIR="${NTFY_DATA_DIR:-/var/lib/ntfy}"
 AUTH_DB="${NTFY_DATA_DIR}/auth.db"
 USER_PROVISIONED_FLAG="${NTFY_DATA_DIR}/.users_provisioned"
 echo "[ntfy-init] Checking if users need provisioning..."
@@ -16,9 +17,10 @@ if [ ! -f "$AUTH_DB" ]; then
     echo "[ntfy-init] ERROR: Auth database not found after 60 seconds"
     exit 1
 fi
+provision_publisher() {
 if [ -f "$USER_PROVISIONED_FLAG" ]; then
-    echo "[ntfy-init] Users already provisioned, skipping"
-    exit 0
+    echo "[ntfy-init] Publisher already provisioned, preserving credentials and ACLs"
+    return 0
 fi
 echo "[ntfy-init] Provisioning users..."
 if [ -z "$NTFY_USERNAME" ] || [ -z "$NTFY_PASSWORD" ]; then
@@ -40,4 +42,25 @@ ntfy access "$NTFY_USERNAME" "test-*" read-write || true
 touch "$USER_PROVISIONED_FLAG"
 echo "[ntfy-init] User provisioning complete!"
 ntfy user list
+}
+provision_publisher
+SSO_PROVISIONED_FLAG="${NTFY_DATA_DIR}/.sso_user_provisioned"
+if [ -f "$SSO_PROVISIONED_FLAG" ]; then
+    echo "[ntfy-init] Managed SSO identity already provisioned, preserving credentials and ACLs"
+    exit 0
+fi
+if [ -z "${NTFY_SSO_PASSWORD:-}" ]; then
+    echo "[ntfy-init] ERROR: NTFY_SSO_PASSWORD is required for the managed SSO identity" >&2
+    exit 1
+fi
+if ntfy user list | grep -q '^user ntfy-sso '; then
+    echo "[ntfy-init] ERROR: Unmanaged ntfy-sso identity exists; preservation review required" >&2
+    exit 1
+fi
+# Only browser admins/operators reach this identity through the gateway. Native
+# publisher credentials and their existing ACLs are neither replaced nor widened.
+NTFY_PASSWORD="$NTFY_SSO_PASSWORD" ntfy user add --role=user ntfy-sso
+ntfy access ntfy-sso '*' read-only
+touch "$SSO_PROVISIONED_FLAG"
+echo "[ntfy-init] Managed read-only SSO identity provisioned"
 exit 0

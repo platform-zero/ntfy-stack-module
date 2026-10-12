@@ -21,6 +21,7 @@ services:
       NTFY_ENABLE_LOGIN: false
       NTFY_USERNAME: "${NTFY_USERNAME}"
       NTFY_PASSWORD: "${NTFY_PASSWORD}"
+      NTFY_SSO_PASSWORD: "${NTFY_SSO_PASSWORD}"
     networks:
     - "caddy"
     volumes:
