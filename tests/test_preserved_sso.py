@@ -21,9 +21,9 @@ class PreservedSso(unittest.TestCase):
  def test_initial_add_preserves_publisher(self):
   r,c,f,m=self.invoke();self.assertEqual(r.returncode,0);self.assertTrue(f);self.assertEqual(m,0o600)
   adds=[x for x in c if'add'in x['args']];self.assertEqual(len(adds),1);self.assertEqual(adds[0]['args'],['user','add','--role=user','ntfy-sso']);self.assertEqual(adds[0]['passwordSha256'],hashlib.sha256(b'fixture-sso-only').hexdigest())
-  self.assertIn(['access','ntfy-sso','*','read-only'],[x['args']for x in c]);self.assertNotIn('fixture-sso-only',r.stdout+r.stderr)
+  self.assertIn(['access','ntfy-sso','*','read-only'],[x['args']for x in c]);self.assertIn(['access','ntfy-sso','p0-owner-*','deny'],[x['args']for x in c]);self.assertNotIn('fixture-sso-only',r.stdout+r.stderr)
  def test_replay_does_not_rotate_or_reset_acls(self):
-  r,c,f,m=self.invoke(replay=True);self.assertEqual(r.returncode,0);self.assertEqual(c,[])
+  r,c,f,m=self.invoke(replay=True);self.assertEqual(r.returncode,0);self.assertEqual([x['args']for x in c],[['access','ntfy-sso','p0-owner-*','deny']]);self.assertFalse(any(x['args'][0]=='user'for x in c))
  def test_missing_secret_refuses(self):
   r,c,f,m=self.invoke(missing=True);self.assertNotEqual(r.returncode,0);self.assertFalse(f);self.assertEqual(c,[])
  def test_unmanaged_existing_identity_preserved(self):

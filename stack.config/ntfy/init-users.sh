@@ -46,7 +46,10 @@ ntfy user list
 provision_publisher
 SSO_PROVISIONED_FLAG="${NTFY_DATA_DIR}/.sso_user_provisioned"
 if [ -f "$SSO_PROVISIONED_FLAG" ]; then
-    echo "[ntfy-init] Managed SSO identity already provisioned, preserving credentials and ACLs"
+    # Narrow only the exclusively managed browser identity. Owner topics must
+    # never become readable through its otherwise read-only wildcard grant.
+    ntfy access ntfy-sso 'p0-owner-*' deny
+    echo "[ntfy-init] Managed SSO identity preserved; private owner topic boundary enforced"
     exit 0
 fi
 if [ -z "${NTFY_SSO_PASSWORD:-}" ]; then
@@ -60,6 +63,7 @@ fi
 # Only browser admins/operators reach this identity through the gateway. Native
 # publisher credentials and their existing ACLs are neither replaced nor widened.
 NTFY_PASSWORD="$NTFY_SSO_PASSWORD" ntfy user add --role=user ntfy-sso
+ntfy access ntfy-sso 'p0-owner-*' deny
 ntfy access ntfy-sso '*' read-only
 touch "$SSO_PROVISIONED_FLAG"
 echo "[ntfy-init] Managed read-only SSO identity provisioned"
