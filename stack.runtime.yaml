@@ -4,7 +4,7 @@ module: "ntfy"
 target: "apps"
 services:
   ntfy:
-    image: "binwiederhier/ntfy:v2.15.0"
+    image: "binwiederhier/ntfy:v2.15.0@sha256:aa10e84da624f65be107f9317dbf6e212fa812e0ebf62e74d032d0762eccc930"
     containerName: "ntfy"
     lifecycle: "daemon"
     updatePolicy: "registry"
